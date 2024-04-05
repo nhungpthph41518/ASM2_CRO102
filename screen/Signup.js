@@ -36,7 +36,7 @@ const Signup = () => {
 			Alert.alert('Thông báo', 'Mật khẩu và Nhập lại mật khẩu không khớp.');
 			return;
 		}
-		let urlapi = 'http://192.168.16.105:3000/tb_user?username=' + username;
+		let urlapi = 'http://192.168.16.108:3000/tb_user?username=' + username;
 		fetch(urlapi)
 			.then((res) => {
 				return res.json();
@@ -50,7 +50,7 @@ const Signup = () => {
 					}
 				} else {
 					axios
-						.post('http://192.168.16.105:3000/tb_user', formdata)
+						.post('http://192.168.16.108:3000/tb_user', formdata)
 						.then((res) => {
 							if (res.data.length !== 1) {
 								navigation.navigate('Login');

@@ -31,7 +31,7 @@ const Contact = () => {
       };
 
       axios
-        .post("http://192.168.16.105:3000/tb_feedback", data)
+        .post("http://192.168.16.108:3000/tb_feedback", data)
         .then((response) => {
           // Xử lý phản hồi từ API nếu cần
           Alert.alert("Success", "Gửi Feedback thành công");

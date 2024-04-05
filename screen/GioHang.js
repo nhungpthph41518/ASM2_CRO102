@@ -16,29 +16,18 @@ import { useNavigation } from "@react-navigation/native";
 const GioHang = () => {
   const [apiData, setApiData] = useState([]);
   const [quantities, setQuantities] = useState({});
-  // const [total, setTotal] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetch("http://192.168.16.105:3000/tb_giohang")
+    fetch("http://192.168.16.108:3000/tb_giohang")
       .then((response) => response.json())
       .then((data) => {
         setApiData(data);
-        calculateTotal(data);
       })
       .catch((error) => console.error(error));
   }, []);
-
-  const calculateTotal = (data) => {
-    let totalPrice = 0;
-    for (const item of data) {
-      const quantity = quantities[item.id] || 0;
-      totalPrice += item.price * quantity;
-    }
-    // setTotal(totalPrice);
-  };
 
   const increaseQuantity = (item) => {
     setQuantities((prevQuantities) => {
@@ -47,7 +36,6 @@ const GioHang = () => {
         ...prevQuantities,
         [item.id]: currentQuantity + 1,
       };
-      calculateTotal(apiData, updatedQuantities);
       return updatedQuantities;
     });
   };
@@ -60,7 +48,6 @@ const GioHang = () => {
           ...prevQuantities,
           [item.id]: currentQuantity - 1,
         };
-        calculateTotal(apiData, updatedQuantities);
         return updatedQuantities;
       } else {
         return prevQuantities;
@@ -69,18 +56,15 @@ const GioHang = () => {
   };
 
   const handleDeleteItem = () => {
-    // Gửi request DELETE đến API để xóa mục đã chọn
     axios
-      .delete(`http://192.168.16.105:3000/tb_giohang/${selectedItem.id}`)
+      .delete(`http://192.168.16.108:3000/tb_giohang/${selectedItem.id}`)
       .then((response) => {
-        // Xóa dữ liệu khỏi state khi xóa thành công trên API
         setApiData((prevApiData) =>
           prevApiData.filter((item) => item.id !== selectedItem.id)
         );
         setQuantities((prevQuantities) => {
           const updatedQuantities = { ...prevQuantities };
           delete updatedQuantities[selectedItem.id];
-          calculateTotal(apiData, updatedQuantities);
           return updatedQuantities;
         });
         setSelectedItem(null);
@@ -94,7 +78,11 @@ const GioHang = () => {
   };
 
   const handleThanhToanPress = () => {
-    navigation.navigate("ThanhToan");
+    const selectedItems = apiData.filter(item => quantities[item.id] > 0);
+    const totalPrice = selectedItems.reduce((total, item) => {
+      return total + (item.price * quantities[item.id]);
+    }, 0);
+    navigation.navigate("ThanhToan", { selectedItems, totalPrice });
   };
 
   const renderItem = ({ item }) => {
@@ -142,7 +130,6 @@ const GioHang = () => {
         keyExtractor={(item) => item.id.toString()}
       />
       <View style={styles.footer}>
-        {/* <Text style={styles.textTotal}>Tổng cộng: {total}</Text> */}
         <TouchableOpacity
           style={styles.checkoutButton}
           onPress={handleThanhToanPress}
@@ -220,20 +207,6 @@ const styles = StyleSheet.create({
   textSo: {
     fontSize: 16,
   },
-  total: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 16,
-  },
-  totalText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginRight: 8,
-  },
-  totalPrice: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   checkoutButton: {
     backgroundColor: "#f08080",
     padding: 16,
@@ -267,21 +240,6 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: "row",
     justifyContent: "flex-end",
-  },
-  total: {
-    marginTop: 20,
-    marginHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  totalText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  totalGia: {
-    fontSize: 20,
-    color: "red",
   },
 });
 

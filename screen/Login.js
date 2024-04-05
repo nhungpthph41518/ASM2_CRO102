@@ -32,9 +32,9 @@ const Login = (props) => {
 
     //thực hiện fetch để lấy dữ liệu về
     let url_check_login =
-      "http://192.168.16.105:3000/tb_user?username=" + username;
+      "http://192.168.16.108:3000/tb_user?username=" + username;
 
-    //  let url_check_login = "http://192.168.16.105:3000/tb_user?username=" + username
+    //  let url_check_login = "http://192.168.16.108:3000/tb_user?username=" + username
 
     fetch(url_check_login)
       .then((res) => {
